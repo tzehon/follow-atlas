@@ -411,6 +411,12 @@ export function FollowAtlasApp() {
     setMobileNavOpen(false);
   }
 
+  function filterByTag(tagId: number) {
+    setSelectedTagIds([tagId]);
+    setUntaggedOnly(false);
+    navigate("accounts");
+  }
+
   async function deleteTag(tag: Tag) {
     if (tag.kind !== "custom") return;
     const confirmed = window.confirm(
@@ -467,6 +473,7 @@ export function FollowAtlasApp() {
         open={mobileNavOpen}
         data={data}
         onNavigate={navigate}
+        onFilterTag={filterByTag}
         onNewTag={() => setTagModalOpen(true)}
       />
 
@@ -549,11 +556,7 @@ export function FollowAtlasApp() {
                 tags={data.tags}
                 onNewTag={() => setTagModalOpen(true)}
                 onDeleteTag={(tag) => void deleteTag(tag)}
-                onFilterTag={(tagId) => {
-                  setSelectedTagIds([tagId]);
-                  setUntaggedOnly(false);
-                  navigate("accounts");
-                }}
+                onFilterTag={filterByTag}
               />
             ) : null}
 
@@ -611,12 +614,14 @@ function Sidebar({
   open,
   data,
   onNavigate,
+  onFilterTag,
   onNewTag,
 }: {
   activeView: ViewKey;
   open: boolean;
   data: AtlasState | null;
   onNavigate: (view: ViewKey) => void;
+  onFilterTag: (tagId: number) => void;
   onNewTag: () => void;
 }) {
   const favoriteTags = data?.tags.filter((tag) => tag.count > 0).slice(0, 5) ?? [];
@@ -652,7 +657,7 @@ function Sidebar({
         <p className="sidebar-label">Quick tags</p>
         {favoriteTags.length ? (
           favoriteTags.map((tag) => (
-            <button key={tag.id} onClick={() => onNavigate("tags")}>
+            <button key={tag.id} onClick={() => onFilterTag(tag.id)}>
               <span className={`mini-swatch tone-${toneFor(tag.color)}`} />
               {tag.name}
               <em>{tag.count}</em>
