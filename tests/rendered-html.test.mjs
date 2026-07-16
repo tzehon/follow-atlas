@@ -40,3 +40,25 @@ test("keeps deployment identity and private imports out of the reusable snapshot
   assert.match(ignore, /followers_and_following/);
   assert.match(ignore, /\.sqlite/);
 });
+
+test("routes sidebar quick tags into the account filter", async () => {
+  const app = await readFile(new URL("app/follow-atlas-app.tsx", root), "utf8");
+  const filterHandler = app.slice(
+    app.indexOf("function filterByTag"),
+    app.indexOf("async function deleteTag"),
+  );
+  const sidebarStart = app.indexOf("<Sidebar");
+  const sidebarUsage = app.slice(sidebarStart, app.indexOf("/>", sidebarStart));
+  const sidebarDefinition = app.slice(
+    app.indexOf("function Sidebar"),
+    app.indexOf("function DemoBanner"),
+  );
+
+  assert.match(filterHandler, /setSelectedTagIds\(\[tagId\]\)/);
+  assert.match(filterHandler, /setUntaggedOnly\(false\)/);
+  assert.match(filterHandler, /navigate\("accounts"\)/);
+  assert.match(sidebarUsage, /onFilterTag=\{filterByTag\}/);
+  assert.match(sidebarDefinition, /onFilterTag: \(tagId: number\) => void/);
+  assert.match(sidebarDefinition, /onClick=\{\(\) => onFilterTag\(tag\.id\)\}/);
+  assert.doesNotMatch(sidebarDefinition, /onClick=\{\(\) => onNavigate\("tags"\)\}/);
+});
