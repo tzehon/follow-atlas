@@ -25,8 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description,
     icons: {
-      icon: "/favicon.svg",
-      shortcut: "/favicon.svg",
+      icon: [{ url: "/favicon.ico", type: "image/x-icon", sizes: "64x64" }],
+      shortcut: "/favicon.ico",
     },
     openGraph: {
       title: "Follow Atlas",

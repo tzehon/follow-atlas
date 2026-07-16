@@ -17,6 +17,7 @@ test("ships the Follow Atlas product shell", async () => {
   assert.match(page, /title:\s*"Follow Atlas"/);
   assert.match(layout, /openGraph/);
   assert.match(layout, /\/og\.png/);
+  assert.match(layout, /\/favicon\.ico/);
   assert.match(app, /Following atlas/);
   assert.match(app, /Refresh list/);
   assert.match(app, /\/api\/state/);
@@ -26,6 +27,9 @@ test("ships the Follow Atlas product shell", async () => {
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   assert.match(packageJson, /"name": "follow-atlas"/);
   await access(new URL("public/og.png", root));
+  const favicon = await readFile(new URL("public/favicon.ico", root));
+  assert.deepEqual([...favicon.subarray(0, 4)], [0, 0, 1, 0]);
+  assert.equal(favicon.readUInt16LE(4), 4);
 });
 
 test("keeps deployment identity and private imports out of the reusable snapshot", async () => {
